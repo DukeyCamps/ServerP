@@ -5,13 +5,17 @@ from threading import Thread
 import sys
 import sqlite3
 
+_PORT_MIN_ = 5600
+_PORT_MAX_ = 5605
+
+
 
 class Client:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     def __init__(self, address):
         
         print("DukiClient started! trying on "+str(address))
-        for x in range(5000,6000):
+        for x in range(_PORT_MIN_, _PORT_MAX_):
             try:
                 self.sock.connect((address, x))
             except:
@@ -39,14 +43,15 @@ class Server:
     def __init__(self):
         global sock, connections    
         port = 5601
-        try:
+        try:    
+            port = random.randint(_PORT_MIN_, _PORT_MAX_)
             self.sock.bind(('0.0.0.0', port))
         except:
-            port = random.randint(5603,5685)
-            self.sock.bind(('0.0.0.0', port))
-
+            print("Error : Cannot bind port")
         self.sock.listen(50)
         print("DukiServer started! Trying on port "+str(port))
+
+
     def run(self):
             while True:
                 c,a = self.sock.accept()
@@ -54,7 +59,6 @@ class Server:
                 cThread.daemon = True
                 cThread.start()
                 self.connections.append(c)
-                print("C" + str(c))
                 print("A" + str(a))
                 print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
 
