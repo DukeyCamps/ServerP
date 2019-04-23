@@ -78,9 +78,7 @@ class Server:
             data = c.recv(1024)
             for connection in self.connections:
                 DATA = bytes(data)
-                #print(data)
-                #print("%s" % data)
-                #print(re.findall(r'\w', data))
+            
 
 
                 readable_data = str(data, 'utf-8')
@@ -91,39 +89,19 @@ class Server:
 
 
                 REQUESTS = re.findall(r'.*[DM][i][MD].*', readable_data) 
-                if len(REQUESTS) > 0:#IF THE REQUEST COMMAND HAS BEEN ISSUED
-                    splits = readable_data.split()#CREATING AN ARRAY OUT OF ALL THE DATA
-                    for splittie in splits[1:]:#FOR EACH ELEMENT IN THE ARRAY
+                if len(REQUESTS) > 0:
+                    splits = readable_data.split()
+                    for splittie in splits[1:]:
                         raw_command += splittie + " "
-                    #print("executing: "+raw_command)
+                   
                     if(raw_command == "help "):
-                        #for connection in self.connections:
+                        
                         connection.send(bytes("A USER HAS REQUESTED URGENT HELP. PLEASE FIND THE USER AND AID HIM NOW.\n", 'utf-8'))
-                    #exec(raw_command)  #A WAY TO EXECUTE COMMANDS ON THE SERVER # BACKDOOR FIXED FOR NOW
+                    
                 else:
                     sentenced_data = readable_data
                     sentenced_data = " ".join(sentenced_data.split())
                     connection.send(bytes('[global] ' + sentenced_data , 'utf-8'))
-
-
-
-
-
-                
-                #coms = data.split()
-                #for com in coms:
-                  #  command = re.findall(r'.*CM.*', com)
-                   # for longcom in command:
-                    #    if len(longcom) > 0:
-                     #       print(longcom)
-                      #      FULLCOMMAND = ""
-                       #     for COMMIE in command:
-                        #        FULLCOMMAND += COMMIE + " " #MAKE THIS SHIT A COMBINATION OF EVERYTHING
-                         #   exec(FULLCOMMAND[2:]) 
-                #connection.send(DATA)
-               
-
-
 
 
             if not data:
