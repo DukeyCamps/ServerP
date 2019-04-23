@@ -6,11 +6,6 @@ import sys
 import sqlite3
 
 
-
-
-
-
-
 class Client:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     def __init__(self, address):
@@ -37,14 +32,7 @@ class Client:
             self.sock.send(bytes(input(), 'utf-8'))
 
 
-
-
-
 class Server:
-    
-
-
-    
     connections = []
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -71,7 +59,6 @@ class Server:
                 print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
 
     
-    
     def handler(self, c , a):
         global connections
         while True:
@@ -83,21 +70,13 @@ class Server:
 
                 readable_data = str(data, 'utf-8')
                 raw_command = ""
-
-
-
-
-
                 REQUESTS = re.findall(r'.*[DM][i][MD].*', readable_data) 
                 if len(REQUESTS) > 0:
                     splits = readable_data.split()
                     for splittie in splits[1:]:
                         raw_command += splittie + " "
-                   
                     if(raw_command == "help "):
-                        
-                        connection.send(bytes("A USER HAS REQUESTED URGENT HELP. PLEASE FIND THE USER AND AID HIM NOW.\n", 'utf-8'))
-                    
+                        connection.send(bytes("broadcast help\n", 'utf-8'))
                 else:
                     sentenced_data = readable_data
                     sentenced_data = " ".join(sentenced_data.split())
@@ -117,5 +96,3 @@ if(len(sys.argv) > 1):
 else:   
     DukiServer = Server()
     DukiServer.run()
-
-    
