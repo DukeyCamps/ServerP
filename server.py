@@ -3,7 +3,6 @@ import random
 import re
 from threading import Thread
 import sys
-import getpass
 import sqlite3
 
 
@@ -35,38 +34,9 @@ class Client:
 
     def sendMSG(self):
         while True:
-            self.sock.send(bytes(getpass.getpass("DiM:>"), 'utf-8'))
+            self.sock.send(bytes(input(), 'utf-8'))
 
 
-    
-
-    
-
-
-class SQL_MANIPT:
-    
-
-    def query(self, querytext):
-        db_con = sqlite3.connect('chatlogs.db')
-        db_cursor = db_con.cursor()    
-        self.db_cursor.execute(querytext)
-    
-    
-    def __init__(self):
-        print("started the db module")    
-        self.create_table()
-        
-
-
-    def create_table(self):
-        self.query("CREATE TABLE IF NOT EXISTS ChatRecords(chat_message TEXT)")
-
-    def enterlog(self, data1):
-        global db_cursor, db_con
-        self.query("""INSERT INTO ChatRecords VALUES('"""+data1+"""')""")
-        self.db_con.commit()
-        self.db_cursor.close()
-        self.db_con.close()
 
 
 
@@ -104,7 +74,6 @@ class Server:
     
     def handler(self, c , a):
         global connections
-        SQLMANIPULATOR = SQL_MANIPT()
         while True:
             data = c.recv(1024)
             for connection in self.connections:
@@ -135,7 +104,6 @@ class Server:
                     sentenced_data = readable_data
                     sentenced_data = " ".join(sentenced_data.split())
                     connection.send(bytes('[global] ' + sentenced_data , 'utf-8'))
-                    SQLMANIPULATOR.enterlog(sentenced_data)
 
 
 
