@@ -21,7 +21,6 @@ class Client:
         while True:
             data, addr = client.recvfrom(1024)
             if(len(data) > 5):
-                print("Connected.")
                 return addr[0]
 
 
@@ -35,7 +34,7 @@ class Client:
 
 
 
-        print("DukiClient started! trying on "+str(address))
+        print("ServerP Client started! trying on "+str(address))
         for x in range(_PORT_MIN_, _PORT_MAX_):
             try:
                 self.sock.connect((self.findBroadcast(), x))
@@ -76,7 +75,7 @@ class Server:
         except:
             print("Error : Cannot bind port")
         self.sock.listen(50)
-        print("Server started: on port "+str(port))
+        print("ServerP started: on port "+str(port))
 
 
     def run(self):
