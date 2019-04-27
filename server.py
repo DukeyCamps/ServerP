@@ -20,8 +20,8 @@ class Client:
 
         while True:
             data, addr = client.recvfrom(1024)
-            print("Connected.")
             if(len(data) > 5):
+                print("Connected.")
                 return addr[0]
 
 
@@ -76,7 +76,7 @@ class Server:
         except:
             print("Error : Cannot bind port")
         self.sock.listen(50)
-        print("DukiServer started! Trying on port "+str(port))
+        print("Server started: on port "+str(port))
 
 
     def run(self):
@@ -92,6 +92,8 @@ class Server:
                 self.connections.append(c)
                 print("A" + str(a))
                 print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
+                for connection in self.connections:
+                    connection.send(bytes("\nA user has connected\n", 'utf-8'))
 
 
     def broadcaster(self):
@@ -100,7 +102,7 @@ class Server:
         # Set a timeout so the socket does not block
         # indefinitely when trying to receive data.
         server.settimeout(0.2)
-        server.bind(("", 15012))
+        server.bind(("", random.randint(15440,15449)))
         message = bytes('join me', 'utf-8')
         while True:
             try:
