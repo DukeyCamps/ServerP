@@ -4,7 +4,7 @@ import re
 from threading import Thread
 import sys
 import sqlite3
-
+import time
 _PORT_MIN_ = 5600
 _PORT_MAX_ = 5605
 
@@ -12,6 +12,21 @@ _PORT_MAX_ = 5605
 class Client:
     username = None
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def findBroadcast(self):
+        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+        client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        client.bind(("", 12164))
+
+        while True:
+            data, addr = client.recvfrom(1024)
+            print("Connected.")
+            if(len(data) > 5):
+                return addr[0]
+
+
+
+
     def __init__(self, address):
         global username
         self.username = input("Please enter your name: ")
@@ -23,12 +38,16 @@ class Client:
         print("DukiClient started! trying on "+str(address))
         for x in range(_PORT_MIN_, _PORT_MAX_):
             try:
-                self.sock.connect((address, x))
+                self.sock.connect((self.findBroadcast(), x))
+                break
             except:
                 pass
         inThread = Thread(target=self.sendMSG)
         inThread.daemon = True
         inThread.start()
+
+
+
 
         while True:
             data = self.sock.recv(1024)
@@ -61,6 +80,10 @@ class Server:
 
 
     def run(self):
+            broadcastThread = Thread(target=self.broadcaster)
+            broadcastThread.daemon = True
+            broadcastThread.start()
+
             while True:
                 c,a = self.sock.accept()
                 cThread = Thread(target= self.handler, args=(c,a))
@@ -69,6 +92,23 @@ class Server:
                 self.connections.append(c)
                 print("A" + str(a))
                 print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
+
+
+    def broadcaster(self):
+        server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        # Set a timeout so the socket does not block
+        # indefinitely when trying to receive data.
+        server.settimeout(0.2)
+        server.bind(("", 15012))
+        message = bytes('join me', 'utf-8')
+        while True:
+            try:
+                server.sendto(message, ('<broadcast>', 12164))
+                print("message sent!")
+                time.sleep(1)
+            except:
+                print("Error : Broadcasting")
 
 
     def handler(self, c , a):
