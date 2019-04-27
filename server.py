@@ -9,11 +9,17 @@ _PORT_MIN_ = 5600
 _PORT_MAX_ = 5605
 
 
-
 class Client:
+    username = None
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     def __init__(self, address):
-        
+        global username
+        self.username = input("Please enter your name: ")
+        print ("\033[A                              \033[A")
+        print("Welcome, "+str(self.username))
+
+
+
         print("DukiClient started! trying on "+str(address))
         for x in range(_PORT_MIN_, _PORT_MAX_):
             try:
@@ -23,7 +29,7 @@ class Client:
         inThread = Thread(target=self.sendMSG)
         inThread.daemon = True
         inThread.start()
-        
+
         while True:
             data = self.sock.recv(1024)
             if not data:
@@ -33,7 +39,9 @@ class Client:
 
     def sendMSG(self):
         while True:
-            self.sock.send(bytes(input(), 'utf-8'))
+            user_msg = input()
+            print ("\033[A                              \033[A")
+            self.sock.send(bytes("["+self.username+"]" + user_msg, 'utf-8'))
 
 
 class Server:
@@ -41,9 +49,9 @@ class Server:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __init__(self):
-        global sock, connections    
+        global sock, connections
         port = 5601
-        try:    
+        try:
             port = random.randint(_PORT_MIN_, _PORT_MAX_)
             self.sock.bind(('0.0.0.0', port))
         except:
@@ -62,19 +70,19 @@ class Server:
                 print("A" + str(a))
                 print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
 
-    
+
     def handler(self, c , a):
         global connections
         while True:
             data = c.recv(1024)
             for connection in self.connections:
                 DATA = bytes(data)
-            
+
 
 
                 readable_data = str(data, 'utf-8')
                 raw_command = ""
-                REQUESTS = re.findall(r'.*[DM][i][MD].*', readable_data) 
+                REQUESTS = re.findall(r'.*[DM][i][MD].*', readable_data)
                 if len(REQUESTS) > 0:
                     splits = readable_data.split()
                     for splittie in splits[1:]:
@@ -84,7 +92,7 @@ class Server:
                 else:
                     sentenced_data = readable_data
                     sentenced_data = " ".join(sentenced_data.split())
-                    connection.send(bytes('[global] ' + sentenced_data , 'utf-8'))
+                    connection.send(bytes(sentenced_data , 'utf-8'))
 
 
             if not data:
@@ -97,6 +105,6 @@ class Server:
 if(len(sys.argv) > 1):
     Dukiclient = Client(sys.argv[1])
     Dukiclient.run()
-else:   
+else:
     DukiServer = Server()
     DukiServer.run()
