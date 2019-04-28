@@ -26,15 +26,15 @@ class Client:
 
 
 
-    def __init__(self, address):
+    def __init__(self):
         global username
         self.username = input("Please enter your name: ")
-        print ("\033[A                              \033[A")
+        #print ("\033[A                              \033[A")
         print("Welcome, "+str(self.username))
 
 
 
-        print("ServerP Client started! trying on "+str(address))
+        print("Client scanning")
         for x in range(_PORT_MIN_, _PORT_MAX_):
             try:
                 self.sock.connect((self.findBroadcast(), x))
@@ -57,10 +57,12 @@ class Client:
 
     def sendMSG(self):
         while True:
-            user_msg = input()
-            print ("\033[A                              \033[A")
-            self.sock.send(bytes("["+self.username+"]" + user_msg, 'utf-8'))
-
+            try:
+                user_msg = input()
+                #print ("\033[A                              \033[A")
+                self.sock.send(bytes("["+self.username+"]" + user_msg, 'utf-8'))
+            except:
+                print("sendMSG error")
 
 class Server:
     connections = []
@@ -68,14 +70,15 @@ class Server:
 
     def __init__(self):
         global sock, connections
-        port = 5601
+        port = None
         try:
             port = random.randint(_PORT_MIN_, _PORT_MAX_)
             self.sock.bind(('0.0.0.0', port))
         except:
             print("Error : Cannot bind port")
+
         self.sock.listen(50)
-        print("<broadcast> on port "+str(port))
+        print("<Broadcast> on port "+str(port))
 
 
     def run(self):
@@ -84,18 +87,16 @@ class Server:
             broadcastThread.start()
 
             while True:
-                try:
-                    c,a = self.sock.accept()
-                    cThread = Thread(target= self.handler, args=(c,a))
-                    cThread.daemon = True
-                    cThread.start()
-                    self.connections.append(c)
-                    print("A" + str(a))
-                    print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
-                    for connection in self.connections:
-                        connection.send(bytes("\nA user has connected\n", 'utf-8'))
-                except:
-                    print("Thread:Socket error in run")
+                c,a = self.sock.accept()
+                cThread = Thread(target= self.handler, args=(c,a))
+                cThread.daemon = True
+                cThread.start()
+                self.connections.append(c)
+                print("A" + str(a))
+                print("connections: "+str(a[0]) + ':' + str(a[1]), "connected")
+                for connection in self.connections:
+                    connection.send(bytes("\nA user has connected\n", 'utf-8'))
+
 
     def broadcaster(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -117,9 +118,7 @@ class Server:
     def handler(self, c , a):
         global connections
         while True:
-
             data = c.recv(1024)
-
             for connection in self.connections:
                 DATA = bytes(data)
 
@@ -147,10 +146,7 @@ class Server:
                 break
 
 
-if(len(sys.argv) > 1):
-    Dukiclient = Client(sys.argv[1])
-    Dukiclient.run()
-else:
-    DukiServer = Server()
-    DukiServer.run()
+
+Dukiclient = Client()
+Dukiclient.run()
 input("press to exit")
