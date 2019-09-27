@@ -145,7 +145,6 @@ class Server:
 
 if(len(sys.argv) > 1):
     Dukiclient = Client(sys.argv[1])
-    Dukiclient.run()
 else:
     DukiServer = Server()
     DukiServer.run()
