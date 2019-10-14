@@ -106,7 +106,7 @@ class Server:
         while True:
             try:
                 server.sendto(message, ('<broadcast>', 12164))
-                print("message sent!")
+                print("<broadcast>")
                 time.sleep(1)
             except:
                 print("Error : Broadcasting")
@@ -145,6 +145,7 @@ class Server:
 
 if(len(sys.argv) > 1):
     Dukiclient = Client(sys.argv[1])
+    # Dukiclient.run()
 else:
     DukiServer = Server()
     DukiServer.run()
