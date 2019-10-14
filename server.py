@@ -63,6 +63,7 @@ class Client:
 
 
 class Server:
+    clients = dict()
     connections = []
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -114,8 +115,11 @@ class Server:
 
     def handler(self, c , a):
         global connections
+        global clients
         while True:
             data = c.recv(1024)
+            self.clients[a[0]] = a[1]
+            print(self.clients[a[0]], str(data, 'utf-8'), end = '') # print the fucking data
             for connection in self.connections:
                 DATA = bytes(data)
 
